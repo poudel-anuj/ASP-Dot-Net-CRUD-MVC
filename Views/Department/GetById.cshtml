@@ -1,0 +1,42 @@
+﻿@model Department.Models.tblDepartment
+
+@{
+    ViewBag.Title = "GetById";
+}
+
+<h2>GetById</h2>
+
+<div>
+    <h4>tblDepartment</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.departName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.departName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.entrydate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.entrydate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.status)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

@@ -1,0 +1,50 @@
+﻿@model Customer.Models.customer
+
+@{
+    ViewBag.Title = "GetById";
+}
+
+<h2>GetById</h2>
+
+<div>
+    <h4>customer</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.cusName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.cusName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.cusEmail)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.cusEmail)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.cusAddress)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.cusAddress)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.entrydate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.entrydate)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "GetCustomerList")
+</p>

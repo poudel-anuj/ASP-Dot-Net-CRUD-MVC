@@ -1,0 +1,281 @@
+﻿@model Customer.Models.customer
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<form method="post">
+    <div class="form-horizontal">
+        <h4>Register</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            <input type="hidden" name="id">
+            <div class="col-md-10">
+                <label>Customer Name </label>
+                <input type="text" class="form-control" name="cusName" placeholder="Enter customer name" id="cusName" />
+
+                @*@Html.EditorFor(model => model.cusName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.cusName, "", new { @class = "text-danger" })*@
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-10">
+                <label>Customer Email </label>
+                <input type="text" class="form-control" name="cusEmail" placeholder="Enter customer email" id="cusEmail" />
+
+
+                @*@Html.EditorFor(model => model.cusEmail, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.cusEmail, "", new { @class = "text-danger" })*@
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-10">
+                <label>Customer Address </label>
+                <input type="text" class="form-control" name="cusAddress" placeholder="Enter customer address" id="cusAddress" />
+
+
+                @*@Html.EditorFor(model => model.cusAddress, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.cusAddress, "", new { @class = "text-danger" })*@
+            </div>
+        </div>
+
+
+
+
+
+        <div class="form-group">
+            <div class="col-md-2">
+                <label>Department</label>
+            </div>
+            <div class="col-md-10">
+                <select class="form-control" name="depId" id="depId">
+                    <option value="0">Choose Department</option>
+                    @{
+                        if (ViewBag.data != null)
+                        {
+                            foreach (var item in ViewBag.data)
+                            {
+                                <option value="@item.id">@item.departName</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input id="btnSubmit" type="button" onclick="InsertCustomer();" value="Create" class="btn btn-success" />
+                <input id="btnUpdate" type="button" onclick="UpdateCustomer();" value="Update" class="btn btn-success" />
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>SN</th>
+            <th>Customer Name</th>
+            <th>Customer Email</th>
+            <th>Customer Address</th>
+            <th>Department</th>
+            <th>Entered date</th>
+        </tr>
+    </thead>
+    <tbody id="getCustomerList">
+    </tbody>
+</table>
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval");
+
+    <script>
+        $('document').ready(function () {
+            GetCustomerList();
+            /*toastr.success("hello world!");*/
+            $('#btnUpdate').hide();
+        });
+
+        function InsertCustomer() {
+
+            //toastr.success('I am clicked');
+
+            if ($('#cusName').val() === '') {
+                toastr.error("Customer name is required");
+                return false;
+            }
+            else if ($('#cusEmail').val() === '') {
+                toastr.error("Customer email is required");
+                return false;
+            }
+            else if ($('#cusAddress').val() === '') {
+                toastr.error("Customer address is required");
+                return false;
+            }
+            else if ($('#depId').val() === '0' || $('#depId').val() === 0) {
+                toastr.error("Department is required");
+                return false;
+            }
+            else {
+
+                var data = {
+                    cusName: $('#cusName').val(),
+                    cusEmail: $('#cusEmail').val(),
+                    cusAddress: $('#cusAddress').val(),
+                    depId: $('#depId').val()
+
+                };
+
+                $.ajax({
+                    url: '/Customer/InsertCustomer',
+                    method: 'post',
+                    dataType: 'json',
+                    data: data,
+                    success: function (data) {
+
+                        toastr.success(data);
+                        //setTimeout(function () {
+
+                        //    window.location.href = '/Customer/GetCustomerList';
+                        //}, 100);
+                        GetCustomerList();
+                        reset();
+                    },
+                    error: function () {
+                        toastr.error("Couldn't insert");
+                    }
+                });
+            }
+        }
+
+        //to get customer list in the same page
+        function GetCustomerList() {
+            $.ajax({
+                url: '/Customer/GetCustomerList',
+                method: 'get',
+                dataType: 'json',
+                // data: data,   mot needed to pull the list
+                success: function (data) {
+                    var cs = '';
+                    var i = 1;
+                    $.each(data, function (key, item) {
+                        cs += '<tr>'
+                        cs += '<td>' + i + '</td>';
+                        cs += '<td>' + item.cusName + '</td>';
+                        cs += '<td>' + item.cusEmail + '</td>';
+                        cs += '<td>' + item.cusAddress + '</td>';
+                        cs += '<td>' + item.departName + '</td>';
+                        cs += '<td>' + item.entrydate + '</td>';
+                        cs += '<td><button class="btn btn-info" onclick="GetCustomerById(' + item.Id + ');">Edit</button> <button class="btn btn-danger" onclick="DeleteCustomer(' + item.Id + ')">Delete</button></td></tr>';
+                        i++;
+                    });
+                    $('#getCustomerList').html(cs);
+                },
+                error: function () {
+                    toastr.error("Unable to retrive data");
+                }
+
+
+            });
+        }
+
+        //get customer by id
+        function GetCustomerById(id) {
+            /* alert(id);*/
+            $.ajax({
+                url: '/Customer/GetCustomerById?id=' + id,
+                method: 'get',
+                dataType: 'json',
+                success: function (data) {
+                    toastr.success("Data found");
+                    $('#btnSubmit').hide();
+                    $('#btnUpdate').show();
+                    $('#cusName').val(data.cusName);
+                    $('#cusEmail').val(data.cusEmail);
+                    $('#cusAddress').val(data.cusAddress);
+                    $('#depId').val(data.depId).change();
+                    $('#id').val(data.id);
+                },
+                error: function (data) {
+                    toastr.error(data);
+                }
+            });
+        }
+
+        function UpdateCustomer() {
+            if ($('#cusName').val() === "") {
+                toaster.error("Customer Name is required");
+            }
+            else if ($('#cusEmail').val() === "") {
+                toaster.error("Customer Email is required");
+            }
+            else if ($('#cusAddress').val() === "") {
+                toaster.error("Customer Email is required");
+            }
+            else if ($('#depId').val() === "0" || $('#depId').val===0) {
+                toaster.error("Department must be selected");
+            }
+            else {
+                var data = {
+                    cusName: $('#cusName').val(),
+                    cusEmail: $('#cusEmail').val(),
+                    cusAddress: $('#cusAddress').val,
+                    depId: $('#depId').val(),
+                    id: $('#id').val(),
+                }
+                $.ajax({
+                    url: 'Customer/Edit?id='+id,
+                    method: 'post',
+                    dataType: 'json',
+                    data:data,
+                    success: function (data) {
+                        toastr.success(data);
+                        $('#btnUpdate').hide();
+                        $('#btnSubmit').show();
+                        reset();
+                    }
+                });
+            }
+        }
+
+        function DeleteCustomer(id) {
+           
+            $.ajax({
+                url: '/Customer/Delete?delId=' + id,
+                method: 'get',
+                dataType: 'json',
+                success: function () {
+                    toastr.success("deleted sucessfully");
+                },
+                error: function () {
+                    toastr.error("Unable to delete");
+                }
+            });
+            
+        }
+
+        function reset() {
+            $('#cusName').val("");
+            $('#cusEmail').val("");
+            $('#cusAddress').val("");
+            $('#depId').val("0").change();
+
+        }
+
+    </script>
+
+
+
+
+}
+
